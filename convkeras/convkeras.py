@@ -14,25 +14,27 @@ class convkeras:
 		self.train_y = {}
 		self.layers = []
 		self.sgd_params = {'learning_rate':0.01}
-		self.loss='mean_squared_error'
+		self.loss='squared_error'
+		self.metrics = ['mae','mse']
+		self.verbose = 0
+		
 
 	def adapt_scaler(self):
-		scaler = tf.keras.layers.Normalization(axis=-1)
-		scaler.adapt(np.array(self.test_X))
-		self.scaler = scaler
+		self.scaler = tf.keras.layers.Normalization(axis=-1)
+		self.scaler.adapt(np.array(self.test_X))
+
+	def optimizer(self):
+		return tf.keras.optimizers.SGD(**self.sgd_params)
 
 	def specify_model(self,layers=None):
 		if layers == None:
 			layers = self.scaler + self.layers
-		model = keras.Sequential(layers)
-		model.compile(
-			loss=self.loss,optimizer=tf.keras.optimizers.SGD(**self.sgd_params)
-		)
-		self.model = model
+		self.model = keras.Sequential(layers)
+		self.model.compile(loss=self.loss,optimizer=self.optimizer())
 
 	def fit_model(self,epochs,verbose=1,validation_split=0.05):
-		self.history = self.model.fit(
+		self.fitted = self.model.fit(
 			self.train_X,self.train_y,
-			verbose=verbose,validation_split=validation_split,
-			epochs=epochs
+			verbose=self.verbose,validation_split=validation_split,
+			epochs=self.epochs
 		)
