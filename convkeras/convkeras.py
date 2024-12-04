@@ -33,6 +33,6 @@ class convkeras:
 	def fit_model(self,epochs,verbose=1,validation_split=0.05):
 		self.history = self.model.fit(
 			self.train_X,self.train_y,
-			verbose=verbose,validation_split=0.05,
+			verbose=verbose,validation_split=validation_split,
 			epochs=epochs
 		)
